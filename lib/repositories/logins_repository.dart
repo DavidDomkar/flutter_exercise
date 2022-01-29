@@ -6,7 +6,7 @@ import '../database/database.dart';
 final loginsRepositoryProvider = Provider<ILoginsRepository>((ref) => throw UnimplementedError());
 
 abstract class ILoginsRepository {
-  Future<void> addLogin(String title, String username, String password);
+  Future<int> addLogin(String title, String username, String password);
   Stream<List<Login>> watchLogins();
   Stream<Login> watchLogin(int id);
 }
@@ -18,10 +18,12 @@ class LoginsRepository extends ILoginsRepository {
   LoginsRepository({required this.database, required this.storage});
 
   @override
-  Future<void> addLogin(String title, String username, String password) async {
+  Future<int> addLogin(String title, String username, String password) async {
     final id = await database.insertLogin(LoginsCompanion.insert(title: title, username: username));
 
     await storage.write(key: 'login_$id', value: password);
+
+    return id;
   }
 
   @override

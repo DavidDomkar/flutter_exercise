@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
 import '../../repositories/logins_repository.dart';
+import '../detail/detail_screen.dart';
 
 final _viewModelProvider = StreamProvider<List<Login>>((ref) {
   final loginsRepository = ref.watch(loginsRepositoryProvider);
@@ -30,7 +31,11 @@ class HomeScreen extends ConsumerWidget {
         },
         error: (_, __) {
           return const Center(
-            child: Text('An error occurred.', style: TextStyle(color: Colors.red)),
+            child: Text(
+              'An error occurred.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.red),
+            ),
           );
         },
         loading: () {
@@ -53,7 +58,14 @@ class HomeScreen extends ConsumerWidget {
       title: Text(login.title),
       subtitle: Text(login.username),
       onTap: () {
-        Navigator.pushNamed(context, '/detail', arguments: login);
+        Navigator.pushNamed(
+          context,
+          '/detail',
+          arguments: DetailScreenArguments(
+            id: login.id,
+            title: login.title,
+          ),
+        );
       },
     );
   }
