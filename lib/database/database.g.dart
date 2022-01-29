@@ -3,88 +3,95 @@
 part of 'database.dart';
 
 // **************************************************************************
+// CopyWithGenerator
+// **************************************************************************
+
+abstract class _$LoginCWProxy {
+  Login id(int id);
+
+  Login password(String password);
+
+  Login title(String title);
+
+  Login username(String username);
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Login(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  ///
+  /// Usage
+  /// ```dart
+  /// Login(...).copyWith(id: 12, name: "My name")
+  /// ````
+  Login call({
+    int? id,
+    String? password,
+    String? title,
+    String? username,
+  });
+}
+
+/// Proxy class for `copyWith` functionality. This is a callable class and can be used as follows: `instanceOfLogin.copyWith(...)`. Additionally contains functions for specific fields e.g. `instanceOfLogin.copyWith.fieldName(...)`
+class _$LoginCWProxyImpl implements _$LoginCWProxy {
+  final Login _value;
+
+  const _$LoginCWProxyImpl(this._value);
+
+  @override
+  Login id(int id) => this(id: id);
+
+  @override
+  Login password(String password) => this(password: password);
+
+  @override
+  Login title(String title) => this(title: title);
+
+  @override
+  Login username(String username) => this(username: username);
+
+  @override
+
+  /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Login(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
+  ///
+  /// Usage
+  /// ```dart
+  /// Login(...).copyWith(id: 12, name: "My name")
+  /// ````
+  Login call({
+    Object? id = const $CopyWithPlaceholder(),
+    Object? password = const $CopyWithPlaceholder(),
+    Object? title = const $CopyWithPlaceholder(),
+    Object? username = const $CopyWithPlaceholder(),
+  }) {
+    return Login(
+      id: id == const $CopyWithPlaceholder()
+          ? _value.id
+          // ignore: cast_nullable_to_non_nullable
+          : id as int,
+      password: password == const $CopyWithPlaceholder()
+          ? _value.password
+          // ignore: cast_nullable_to_non_nullable
+          : password as String,
+      title: title == const $CopyWithPlaceholder()
+          ? _value.title
+          // ignore: cast_nullable_to_non_nullable
+          : title as String,
+      username: username == const $CopyWithPlaceholder()
+          ? _value.username
+          // ignore: cast_nullable_to_non_nullable
+          : username as String,
+    );
+  }
+}
+
+extension $LoginCopyWith on Login {
+  /// Returns a callable class that can be used as follows: `instanceOfclass Login.name.copyWith(...)` or like so:`instanceOfclass Login.name.copyWith.fieldName(...)`.
+  _$LoginCWProxy get copyWith => _$LoginCWProxyImpl(this);
+}
+
+// **************************************************************************
 // MoorGenerator
 // **************************************************************************
 
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
-class Login extends DataClass implements Insertable<Login> {
-  final int id;
-  final String title;
-  final String username;
-  Login({required this.id, required this.title, required this.username});
-  factory Login.fromData(Map<String, dynamic> data, {String? prefix}) {
-    final effectivePrefix = prefix ?? '';
-    return Login(
-      id: const IntType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
-      title: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}title'])!,
-      username: const StringType()
-          .mapFromDatabaseResponse(data['${effectivePrefix}username'])!,
-    );
-  }
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['title'] = Variable<String>(title);
-    map['username'] = Variable<String>(username);
-    return map;
-  }
-
-  LoginsCompanion toCompanion(bool nullToAbsent) {
-    return LoginsCompanion(
-      id: Value(id),
-      title: Value(title),
-      username: Value(username),
-    );
-  }
-
-  factory Login.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Login(
-      id: serializer.fromJson<int>(json['id']),
-      title: serializer.fromJson<String>(json['title']),
-      username: serializer.fromJson<String>(json['username']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'title': serializer.toJson<String>(title),
-      'username': serializer.toJson<String>(username),
-    };
-  }
-
-  Login copyWith({int? id, String? title, String? username}) => Login(
-        id: id ?? this.id,
-        title: title ?? this.title,
-        username: username ?? this.username,
-      );
-  @override
-  String toString() {
-    return (StringBuffer('Login(')
-          ..write('id: $id, ')
-          ..write('title: $title, ')
-          ..write('username: $username')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, title, username);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Login &&
-          other.id == this.id &&
-          other.title == this.title &&
-          other.username == this.username);
-}
-
 class LoginsCompanion extends UpdateCompanion<Login> {
   final Value<int> id;
   final Value<String> title;
@@ -201,8 +208,15 @@ class $LoginsTable extends Logins with TableInfo<$LoginsTable, Login> {
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Login map(Map<String, dynamic> data, {String? tablePrefix}) {
-    return Login.fromData(data,
-        prefix: tablePrefix != null ? '$tablePrefix.' : null);
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Login(
+      id: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      title: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}title'])!,
+      username: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}username'])!,
+    );
   }
 
   @override
