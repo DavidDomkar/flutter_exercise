@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
-import '../../screens/detail/detail_screen.dart';
 
 import 'widgets/password_form_field.dart';
 import 'widgets/submit_button.dart';
@@ -15,15 +14,16 @@ final _viewModelProvider = ChangeNotifierProvider.autoDispose.family<LoginFormVi
 class LoginForm extends ConsumerWidget {
   final Login? login;
   final bool readOnly;
+  final void Function(int id, String title)? onSaved;
 
-  const LoginForm({Key? key, this.login, this.readOnly = false}) : super(key: key);
+  const LoginForm({Key? key, this.login, this.readOnly = false, this.onSaved}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.read(_viewModelProvider(login));
 
     return Form(
-      key: viewModel.formKey,
+      key: readOnly ? null : viewModel.formKey,
       child: Column(
         children: [
           Padding(
@@ -40,12 +40,7 @@ class LoginForm extends ConsumerWidget {
                 alignLabelWithHint: true,
                 suffixIcon: readOnly
                     ? IconButton(
-                        onPressed: () async {
-                          await Clipboard.setData(ClipboardData(text: viewModel.title));
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                            content: Text('Title copied to clipboard'),
-                          ));
-                        },
+                        onPressed: () => copyToClipboard(context, viewModel.title, 'Title'),
                         icon: const Icon(Icons.copy),
                       )
                     : null,
@@ -66,12 +61,7 @@ class LoginForm extends ConsumerWidget {
                 alignLabelWithHint: true,
                 suffixIcon: readOnly
                     ? IconButton(
-                        onPressed: () async {
-                          await Clipboard.setData(ClipboardData(text: viewModel.username));
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                            content: Text('Username / Email copied to clipboard'),
-                          ));
-                        },
+                        onPressed: () => copyToClipboard(context, viewModel.username, 'Username / Email'),
                         icon: const Icon(Icons.copy),
                       )
                     : null,
@@ -86,12 +76,7 @@ class LoginForm extends ConsumerWidget {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: viewModel.emptyFieldValidator,
               onChanged: (value) => viewModel.password = value,
-              onCopyPressed: () async {
-                await Clipboard.setData(ClipboardData(text: viewModel.password));
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Password copied to clipboard'),
-                ));
-              },
+              onCopyPressed: () => copyToClipboard(context, viewModel.password, 'Password'),
               readOnly: readOnly,
             ),
           ),
@@ -104,20 +89,22 @@ class LoginForm extends ConsumerWidget {
                 onPressed: () async {
                   final id = await viewModel.submit();
 
-                  if (id != null) {
-                    Navigator.of(context).pushReplacementNamed(
-                      '/detail',
-                      arguments: DetailScreenArguments(
-                        id: id,
-                        title: viewModel.title,
-                      ),
-                    );
+                  if (id != null && onSaved != null) {
+                    onSaved!(id, viewModel.title);
                   }
                 },
+                child: login != null ? const Text('Save') : const Text('Add login'),
               );
             }),
         ],
       ),
     );
+  }
+
+  Future<void> copyToClipboard(BuildContext context, String data, String label) async {
+    await Clipboard.setData(ClipboardData(text: data));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('$label copied to clipboard'),
+    ));
   }
 }

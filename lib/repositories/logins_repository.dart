@@ -8,7 +8,7 @@ final loginsRepositoryProvider = Provider<ILoginsRepository>((ref) => throw Unim
 
 abstract class ILoginsRepository {
   Future<int> addLogin(String title, String username, String password);
-  Future<void> editLogin(int id, {String? title, String? username, String? password});
+  Future<void> editLogin(int id, String? title, String? username, String? password);
   Future<void> deleteLogin(int id);
   Stream<List<Login>> watchLogins();
   Stream<Login?> watchLogin(int id);
@@ -30,7 +30,7 @@ class LoginsRepository extends ILoginsRepository {
   }
 
   @override
-  Future<void> editLogin(int id, {String? title, String? username, String? password}) async {
+  Future<void> editLogin(int id, String? title, String? username, String? password) async {
     await database.updateLogin(LoginsCompanion(
       id: Value(id),
       title: title != null ? Value(title) : const Value.absent(),

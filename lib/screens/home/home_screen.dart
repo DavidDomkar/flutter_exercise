@@ -2,21 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
-import '../../repositories/logins_repository.dart';
+import '../../providers.dart';
 import '../detail/detail_screen.dart';
-
-final _loginsProvider = StreamProvider.autoDispose<List<Login>>((ref) {
-  final loginsRepository = ref.watch(loginsRepositoryProvider);
-
-  return loginsRepository.watchLogins();
-});
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final logins = ref.watch(_loginsProvider);
+    final logins = ref.watch(loginsProvider);
 
     return Scaffold(
       appBar: AppBar(

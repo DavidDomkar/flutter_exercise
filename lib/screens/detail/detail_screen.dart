@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers.dart';
 import '../../widgets/login_form/login_form.dart';
-import '../../database/database.dart';
-import '../../repositories/logins_repository.dart';
+import '../form/form_screen.dart';
 import 'detail_view_model.dart';
-
-final _loginProvider = StreamProvider.autoDispose.family<Login?, int>((ref, id) {
-  final loginsRepository = ref.watch(loginsRepositoryProvider);
-
-  return loginsRepository.watchLogin(id).distinct((previous, current) => previous != null && current == null);
-});
 
 final _viewModelProvider = Provider.autoDispose((ref) => DetailViewModel(ref.read));
 
@@ -30,15 +24,24 @@ class DetailScreen extends ConsumerWidget {
 
     final viewModel = ref.read(_viewModelProvider);
 
-    final login = ref.watch(_loginProvider(arguments.id));
+    final login = ref.watch(loginProvider(arguments.id));
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('${arguments.title} details'),
+        title: Text('${login.asData?.value?.title ?? arguments.title} details'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () async {},
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/form',
+                arguments: FormScreenArguments(
+                  id: arguments.id,
+                  title: arguments.title,
+                ),
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.delete),
@@ -55,6 +58,7 @@ class DetailScreen extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: LoginForm(
+                key: ValueKey(data),
                 login: data,
                 readOnly: true,
               ),
