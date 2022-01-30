@@ -43,7 +43,15 @@ class Database extends _$Database {
     return into(logins).insert(entry);
   }
 
+  Future<void> updateLogin(LoginsCompanion entry) {
+    return update(logins).replace(entry);
+  }
+
+  Future<void> deleteLogin(int id) {
+    return (delete(logins)..where((entry) => entry.id.equals(id))).go();
+  }
+
   Stream<List<Login>> watchLogins() => select(logins).watch();
 
-  Stream<Login> watchLogin(int id) => (select(logins)..where((login) => login.id.equals(id))).watchSingle();
+  Stream<Login?> watchLogin(int id) => (select(logins)..where((entry) => entry.id.equals(id))).watchSingleOrNull();
 }

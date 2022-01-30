@@ -4,12 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../widgets/login_form/login_form.dart';
 import '../../database/database.dart';
 import '../../repositories/logins_repository.dart';
+import 'detail_view_model.dart';
 
-final _viewModelProvider = StreamProvider.family<Login, int>((ref, id) {
+final _loginProvider = StreamProvider.autoDispose.family<Login?, int>((ref, id) {
   final loginsRepository = ref.watch(loginsRepositoryProvider);
 
-  return loginsRepository.watchLogin(id);
+  return loginsRepository.watchLogin(id).distinct((previous, current) => previous != null && current == null);
 });
+
+final _viewModelProvider = Provider.autoDispose((ref) => DetailViewModel(ref.read));
 
 class DetailScreenArguments {
   final int id;
@@ -25,19 +28,36 @@ class DetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final arguments = ModalRoute.of(context)!.settings.arguments as DetailScreenArguments;
 
-    final viewModel = ref.watch(_viewModelProvider(arguments.id));
+    final viewModel = ref.read(_viewModelProvider);
+
+    final login = ref.watch(_loginProvider(arguments.id));
 
     return Scaffold(
       appBar: AppBar(
         title: Text('${arguments.title} details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () async {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () async {
+              await viewModel.deleteLogin(arguments.id);
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
-      body: viewModel.when(
+      body: login.when(
         data: (data) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: LoginForm(
-              login: data,
-              readOnly: true,
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: LoginForm(
+                login: data,
+                readOnly: true,
+              ),
             ),
           );
         },

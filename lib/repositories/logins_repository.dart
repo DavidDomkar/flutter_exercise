@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -7,8 +8,10 @@ final loginsRepositoryProvider = Provider<ILoginsRepository>((ref) => throw Unim
 
 abstract class ILoginsRepository {
   Future<int> addLogin(String title, String username, String password);
+  Future<void> editLogin(int id, {String? title, String? username, String? password});
+  Future<void> deleteLogin(int id);
   Stream<List<Login>> watchLogins();
-  Stream<Login> watchLogin(int id);
+  Stream<Login?> watchLogin(int id);
 }
 
 class LoginsRepository extends ILoginsRepository {
@@ -27,14 +30,33 @@ class LoginsRepository extends ILoginsRepository {
   }
 
   @override
+  Future<void> editLogin(int id, {String? title, String? username, String? password}) async {
+    await database.updateLogin(LoginsCompanion(
+      id: Value(id),
+      title: title != null ? Value(title) : const Value.absent(),
+      username: username != null ? Value(username) : const Value.absent(),
+    ));
+
+    if (password != null) {
+      await storage.write(key: 'login_$id', value: password);
+    }
+  }
+
+  @override
+  Future<void> deleteLogin(int id) async {
+    await database.deleteLogin(id);
+    await storage.delete(key: 'login_$id');
+  }
+
+  @override
   Stream<List<Login>> watchLogins() => database.watchLogins();
 
   @override
-  Stream<Login> watchLogin(int id) {
+  Stream<Login?> watchLogin(int id) {
     return database.watchLogin(id).asyncMap((login) async {
       final password = await storage.read(key: 'login_$id');
 
-      return login.copyWith(password: password);
+      return login?.copyWith(password: password);
     });
   }
 }

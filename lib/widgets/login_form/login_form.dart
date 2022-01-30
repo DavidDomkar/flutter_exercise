@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../database/database.dart';
 import '../../screens/detail/detail_screen.dart';
-import 'login_form_view_model.dart';
+
 import 'widgets/password_form_field.dart';
 import 'widgets/submit_button.dart';
+
+import 'login_form_view_model.dart';
 
 final _viewModelProvider = ChangeNotifierProvider.autoDispose.family<LoginFormViewModel, Login?>((ref, login) => LoginFormViewModel(ref.read, login));
 

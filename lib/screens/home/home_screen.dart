@@ -5,7 +5,7 @@ import '../../database/database.dart';
 import '../../repositories/logins_repository.dart';
 import '../detail/detail_screen.dart';
 
-final _viewModelProvider = StreamProvider<List<Login>>((ref) {
+final _loginsProvider = StreamProvider.autoDispose<List<Login>>((ref) {
   final loginsRepository = ref.watch(loginsRepositoryProvider);
 
   return loginsRepository.watchLogins();
@@ -16,13 +16,13 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.watch(_viewModelProvider);
+    final logins = ref.watch(_loginsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Password Manager'),
       ),
-      body: viewModel.when(
+      body: logins.when(
         data: (data) {
           return ListView.builder(
             itemBuilder: (context, index) => _buildItem(context, data[index]),
