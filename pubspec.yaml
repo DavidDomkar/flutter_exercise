@@ -21,6 +21,8 @@ dependencies:
 
   copy_with_extension: 4.0.0
 
+  local_auth: 1.1.10
+
   flutter_riverpod: 2.0.0-dev.0
 
 dev_dependencies:

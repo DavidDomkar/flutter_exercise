@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 
 class PasswordFormField extends StatefulWidget {
   final String? initialValue;
@@ -25,6 +26,7 @@ class PasswordFormField extends StatefulWidget {
 }
 
 class _PasswordFormFieldState extends State<PasswordFormField> {
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
   bool _obscureText = true;
 
   @override
@@ -44,12 +46,36 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              onPressed: () => setState(() => _obscureText = !_obscureText),
+              onPressed: () async {
+                if (_obscureText && widget.readOnly && await _localAuthentication.canCheckBiometrics) {
+                  try {
+                    final authenticated = await _localAuthentication.authenticate(localizedReason: 'Please authenticate to show password!');
+
+                    if (!authenticated) {
+                      return;
+                    }
+                  } catch (_) {}
+                }
+
+                setState(() => _obscureText = !_obscureText);
+              },
               icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
             ),
             if (widget.readOnly)
               IconButton(
-                onPressed: widget.onCopyPressed,
+                onPressed: () async {
+                  if (await _localAuthentication.canCheckBiometrics) {
+                    try {
+                      final authenticated = await _localAuthentication.authenticate(localizedReason: 'Please authenticate to copy password!');
+
+                      if (!authenticated) {
+                        return;
+                      }
+                    } catch (_) {}
+                  }
+
+                  widget.onCopyPressed?.call();
+                },
                 icon: const Icon(Icons.copy),
               ),
           ],

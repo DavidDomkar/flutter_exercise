@@ -40,10 +40,10 @@ class LoginFormViewModel extends ChangeNotifier {
     int id;
 
     if (login != null) {
-      await _loginsRepository.editLogin(login!.id, title, username, password);
+      await _loginsRepository.editLogin(login!.id, title.trim(), username.trim(), password.trim());
       id = login!.id;
     } else {
-      id = await _loginsRepository.addLogin(title, username, password);
+      id = await _loginsRepository.addLogin(title.trim(), username.trim(), password.trim());
     }
 
     return id;
