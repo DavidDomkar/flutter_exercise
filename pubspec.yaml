@@ -23,6 +23,8 @@ dependencies:
 
   local_auth: 1.1.10
 
+  password_strength: 0.2.0
+
   flutter_riverpod: 2.0.0-dev.0
 
 dev_dependencies:

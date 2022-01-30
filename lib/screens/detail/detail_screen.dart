@@ -5,6 +5,7 @@ import '../../providers.dart';
 import '../../widgets/login_form/login_form.dart';
 import '../form/form_screen.dart';
 import 'detail_view_model.dart';
+import 'widgets/delete_dialog.dart';
 
 final _viewModelProvider = Provider.autoDispose((ref) => DetailViewModel(ref.read));
 
@@ -26,9 +27,11 @@ class DetailScreen extends ConsumerWidget {
 
     final login = ref.watch(loginProvider(arguments.id));
 
+    final loginTitle = login.asData?.value?.title ?? arguments.title;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('${login.asData?.value?.title ?? arguments.title} details'),
+        title: Text('$loginTitle details'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -38,16 +41,26 @@ class DetailScreen extends ConsumerWidget {
                 '/form',
                 arguments: FormScreenArguments(
                   id: arguments.id,
-                  title: arguments.title,
+                  title: loginTitle,
                 ),
               );
             },
           ),
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () async {
-              await viewModel.deleteLogin(arguments.id);
-              Navigator.pop(context);
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) {
+                  return DeleteDialog(
+                    loginTitle: loginTitle,
+                    onDeletePressed: () async {
+                      await viewModel.deleteLogin(arguments.id);
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              );
             },
           ),
         ],

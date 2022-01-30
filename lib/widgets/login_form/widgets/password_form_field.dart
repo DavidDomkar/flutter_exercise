@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:password_strength/password_strength.dart';
 
 class PasswordFormField extends StatefulWidget {
   final String? initialValue;
@@ -29,6 +30,14 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
   final LocalAuthentication _localAuthentication = LocalAuthentication();
   bool _obscureText = true;
 
+  String _password = '';
+
+  @override
+  void initState() {
+    _password = widget.initialValue ?? '';
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -36,12 +45,21 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
       textInputAction: widget.textInputAction,
       autovalidateMode: widget.autovalidateMode,
       validator: widget.validator,
-      onChanged: widget.onChanged,
+      onChanged: (String value) {
+        setState(() {
+          _password = value;
+        });
+        widget.onChanged?.call(value);
+      },
       obscureText: _obscureText,
       readOnly: widget.readOnly,
       decoration: InputDecoration(
         labelText: 'Password',
         alignLabelWithHint: true,
+        helperText: _getPasswordStrengthString(),
+        helperStyle: TextStyle(
+          color: _getPasswordStrengthColor(),
+        ),
         suffixIcon: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -82,5 +100,37 @@ class _PasswordFormFieldState extends State<PasswordFormField> {
         ),
       ),
     );
+  }
+
+  String? _getPasswordStrengthString() {
+    if (_password.isEmpty) {
+      return null;
+    }
+
+    final strength = estimatePasswordStrength(_password);
+
+    if (strength < 0.33) {
+      return 'Password strength: Weak';
+    } else if (strength < 0.66) {
+      return 'Password strength: Medium';
+    } else {
+      return 'Password strength: Strong';
+    }
+  }
+
+  Color? _getPasswordStrengthColor() {
+    if (_password.isEmpty) {
+      return null;
+    }
+
+    final strength = estimatePasswordStrength(_password);
+
+    if (strength < 0.33) {
+      return Colors.red;
+    } else if (strength < 0.66) {
+      return Colors.orange;
+    } else {
+      return Colors.green;
+    }
   }
 }
