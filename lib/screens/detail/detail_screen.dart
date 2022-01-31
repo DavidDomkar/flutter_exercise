@@ -36,31 +36,34 @@ class DetailScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              Navigator.pushNamed(
-                context,
-                '/form',
-                arguments: FormScreenArguments(
-                  id: arguments.id,
-                  title: loginTitle,
-                ),
-              );
+              if (login.asData?.value != null) {
+                Navigator.pushNamed(
+                  context,
+                  '/form',
+                  arguments: FormScreenArguments(
+                    login: login.asData?.value,
+                  ),
+                );
+              }
             },
           ),
           IconButton(
             icon: const Icon(Icons.delete),
             onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) {
-                  return DeleteDialog(
-                    loginTitle: loginTitle,
-                    onDeletePressed: () async {
-                      await viewModel.deleteLogin(arguments.id);
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              );
+              if (login.asData?.value != null) {
+                showDialog(
+                  context: context,
+                  builder: (_) {
+                    return DeleteDialog(
+                      loginTitle: loginTitle,
+                      onDeletePressed: () async {
+                        await viewModel.deleteLogin(arguments.id);
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                );
+              }
             },
           ),
         ],

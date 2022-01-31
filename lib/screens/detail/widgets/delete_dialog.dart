@@ -13,15 +13,15 @@ class DeleteDialog extends StatelessWidget {
       content: const Text('Are you sure you want to delete this login?'),
       actions: [
         TextButton(
-          child: const Text('Delete'),
+          child: const Text('Cancel'),
           onPressed: () {
-            onDeletePressed();
             Navigator.of(context).pop();
           },
         ),
         TextButton(
-          child: const Text('Cancel'),
+          child: const Text('Delete'),
           onPressed: () {
+            onDeletePressed();
             Navigator.of(context).pop();
           },
         ),
